@@ -41,17 +41,19 @@
                     ref="form"
                     v-model="valid"
                     lazy-validation
-                    class="pa-5"
-                  >
+                    class="pa-5">
                     <p>Vendor ID: </p>
-                    <v-select
-                        v-model="product_id"
-                        :items="products"
-                        :rules="[v => !!v || 'Item is required']"
-                        label="Product ID"
-                        required
+                     <v-select
+                      v-model="product"
+                      :hint="`ProductId: ${product.id}, ProductName: ${product.title}`"
+                      :items="product_items"
+                      item-text="title"
+                      item-value="id"
+                      label="Select"
+                      persistent-hint
+                      return-object
+                      single-line
                     ></v-select>
-                    <p v-if="product_id!=''">Product Name: {{product_id}}</p>
                     <v-menu
                       v-model="delivery_date"
                       :close-on-content-click="false"
@@ -103,6 +105,7 @@
 <script>
 import AdminDashboardHeader from '@/components/layout/AdminDashboardHeader.vue'
 import AdminDashboardSideNav from '@/components/layout/AdminDashboardSideNav.vue'
+import apiProduct from './apiProduct'
 
 export default {
   data () {
@@ -111,9 +114,9 @@ export default {
       date: '',
       delivery_date: false,
       mode_of_payment: ['Cash', 'Online'],
-      products: ['Foo', 'Bar', 'Fizz', 'Buzz'],
       select_payment: '',
-      product_id: ''
+      product: { id: '', title: '' },
+      product_items: null
     }
   },
   props: {
@@ -124,9 +127,22 @@ export default {
     AdminDashboardSideNav
   },
   methods: {
+    getProducts () {
+      apiProduct.getAll()
+        .then(response => {
+          this.product_items = response.data
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
+
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'
     }
+  },
+  mounted () {
+    this.getProducts()
   }
 }
 </script>
