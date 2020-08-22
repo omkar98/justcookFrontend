@@ -12,6 +12,10 @@ class VendorDataService {
   create (data) {
     return api.post('/vendor', data)
   }
+
+  delete (id) {
+    return api.delete(`/vendor/${id}`)
+  }
 }
 
 export default new VendorDataService()

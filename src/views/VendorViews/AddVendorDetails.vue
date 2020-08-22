@@ -50,8 +50,7 @@
                       label="Vendor Contact Details"
                       required
                     ></v-text-field>
-                    <v-file-input @change="onFileUpload" type="file" label="Vendor Image" ref="files"></v-file-input>
-
+                    <v-file-input @change="onFileUpload" type="file" label="Vendor Image"></v-file-input>
                     <v-btn
                       color="warning"
                       @click="saveVendor"
@@ -99,7 +98,8 @@ export default {
         address: '',
         phone_no: '',
         image: ''
-      }
+      },
+      formData: new FormData()
     }
   },
   props: {
@@ -111,20 +111,16 @@ export default {
   },
   methods: {
     onFileUpload (event) {
-      console.log(event.target)
+      this.formData.append('image', event)
     },
-    saveVendor (event) {
-      var data = {
-        name: this.vendor.name,
-        address: this.vendor.address,
-        phone_no: this.vendor.phone_no,
-        image: this.vendor.image
-      }
-      console.log(data)
-      apiVendor.create(data)
+    saveVendor () {
+      this.formData.append('name', this.vendor.name)
+      this.formData.append('address', this.vendor.address)
+      this.formData.append('phone_no', this.vendor.phone_no)
+
+      apiVendor.create(this.formData)
         .then(response => {
           this.vendor.id = response.data.id
-          console.log(response.data)
         })
         .catch(e => {
           console.log(e)

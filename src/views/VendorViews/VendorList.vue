@@ -53,7 +53,7 @@
         </v-btn>
         <v-icon
             small
-            @click="deleteItem(item)"
+            @click="deleteVendor(item.id)"
         >
             mdi-delete
         </v-icon>
@@ -82,7 +82,8 @@ export default {
           value: 'id'
         },
         { text: 'Name', value: 'name' },
-        { text: 'Phone No', value: 'phone_no' }
+        { text: 'Phone No', value: 'phone_no' },
+        { text: 'Actions', value: 'actions', sortable: false }
       ],
       vendors: []
     }
@@ -104,15 +105,20 @@ export default {
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'
     },
-    deleteItem (item) {
-      const index = this.vendors.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.vendors.splice(index, 1)
+    deleteVendor (item) {
+      confirm('Are you sure you want to delete this item?')
+      apiVendor.delete(item)
+        .then(response => {
+          this.$router.push({ name: '/' })
+        })
+        .catch(e => {
+          console.log(e)
+        })
     },
     retrieveVendors () {
       apiVendor.getAll()
         .then(response => {
           this.vendors = response.data
-          console.log(response.data)
         })
         .catch(e => {
           console.log(e)
