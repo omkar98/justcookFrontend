@@ -33,33 +33,28 @@
                     lazy-validation
                   >
                     <v-text-field
-                      v-model="name"
+                      v-model="vendor.name"
                       :rules="nameRules"
                       label="Vendor Name"
                       required
                     ></v-text-field>
                     <v-text-field
-                      v-model="address"
+                      v-model="vendor.address"
                       :rules="addressRules"
                       label="Vendor Address"
                       required
                     ></v-text-field>
                     <v-text-field
-                      v-model="poc"
-                      :rules="pocRules"
-                      label="Vendor POC"
-                      required
-                    ></v-text-field>
-                    <v-text-field
-                      v-model="contact"
+                      v-model="vendor.phone_no"
                       :rules="contactRules"
                       label="Vendor Contact Details"
                       required
                     ></v-text-field>
-                    <v-file-input multiple label="Vendor Image" chips show-size accept="image/*"></v-file-input>
+                    <v-file-input @change="onFileUpload" type="file" label="Vendor Image" ref="files"></v-file-input>
+
                     <v-btn
                       color="warning"
-                      @click="resetValidation"
+                      @click="saveVendor"
                     >
                       Submit
                     </v-btn>
@@ -78,6 +73,7 @@
 <script>
 import AdminDashboardHeader from '@/components/layout/AdminDashboardHeader.vue'
 import AdminDashboardSideNav from '@/components/layout/AdminDashboardSideNav.vue'
+import apiVendor from './apiVendor'
 
 export default {
   data () {
@@ -92,15 +88,18 @@ export default {
       addressRules: [
         v => !!v || 'Address is required'
       ],
-      poc: '',
-      pocRules: [
-        v => !!v || 'POC is required'
-      ],
-      contact: '',
+      phone_no: '',
       contactRules: [
         v => !!v || 'Contact Number is required',
         v => /^[6-9]\d{9}$/.test(v) || 'Contact Number must be valid'
-      ]
+      ],
+      vendor: {
+        id: null,
+        name: '',
+        address: '',
+        phone_no: '',
+        image: ''
+      }
     }
   },
   props: {
@@ -111,6 +110,26 @@ export default {
     AdminDashboardSideNav
   },
   methods: {
+    onFileUpload (event) {
+      console.log(event.target)
+    },
+    saveVendor (event) {
+      var data = {
+        name: this.vendor.name,
+        address: this.vendor.address,
+        phone_no: this.vendor.phone_no,
+        image: this.vendor.image
+      }
+      console.log(data)
+      apiVendor.create(data)
+        .then(response => {
+          this.vendor.id = response.data.id
+          console.log(response.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'
     }

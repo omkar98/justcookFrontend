@@ -30,22 +30,52 @@
             <v-col lg="8">
               <v-card outlined class="pa-5">
                 <template>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <tbody>
-                        <tr v-for="item in vendor_details" :key="item.name">
-                          <td>{{ item.name }}</td>
-                          <td>{{ item.value }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
+                  <div v-if="loading">
+                    <!-- <v-progress-circular
+                      :size="70"
+                      :width="7"
+                      indeterminate
+                      color="primary"
+                    ></v-progress-circular> -->
+                    <v-progress-linear
+                      indeterminate
+                      color="green"
+                    ></v-progress-linear>
+                  </div>
+                  <div v-else>
+                    <v-simple-table>
+                      <template v-slot:default>
+                        <tbody>
+                          <tr>
+                            <td>Name: </td>
+                            <td>{{ vendor_details.name }}</td>
+                          </tr>
+                          <tr>
+                            <td>Address: </td>
+                            <td>{{ vendor_details.address }}</td>
+                          </tr>
+                          <tr>
+                            <td>Phone No: </td>
+                            <td>{{ vendor_details.phone_no }}</td>
+                          </tr>
+                          <tr>
+                            <td>Created at: </td>
+                            <td>{{ vendor_details.created_at }}</td>
+                          </tr><tr>
+                            <td>Last Updated at: </td>
+                            <td>{{ vendor_details.updated_at }}</td>
+                          </tr>
+                        </tbody>
+                      </template>
                   </v-simple-table>
+                  </div>
                 </template>
               </v-card>
             </v-col>
             <v-col lg="4">
               <v-card outlined class="pa-5">
-                <v-img src="@/assets/justCook.png" contain max-width="200" max-height="200"></v-img>
+                <v-img src="@/assets/justCook.png" contain max-width="200" max-height="200">
+                </v-img>
               </v-card>
             </v-col>
           </v-row>
@@ -76,7 +106,7 @@
                          <v-data-table
                           :headers="headers"
                           :items="invoices"
-                          sort-by="calories"
+                          sort-by="invoice_id"
                           class="elevation-1"
                       >
                       <template v-slot:[`item.name`]="{ item }">
@@ -117,38 +147,18 @@
   </v-container>
   </v-app>
 </template>
-
 <script>
 import AdminDashboardHeader from '@/components/layout/AdminDashboardHeader.vue'
 import AdminDashboardSideNav from '@/components/layout/AdminDashboardSideNav.vue'
+import apiVendor from './apiVendor'
 
 export default {
   data () {
     return {
       drawer: null,
+      loading: false,
       dialog: false,
-      vendor_details: [
-        {
-          name: 'Vendor Name',
-          value: 'PMart'
-        },
-        {
-          name: 'Vendor Address',
-          value: 'XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ XYZ'
-        },
-        {
-          name: 'Vendor POC',
-          value: 'ABC'
-        },
-        {
-          name: 'Vendor Contact Details',
-          value: 9999999999
-        },
-        {
-          name: 'Payment Due',
-          value: 540.22
-        }
-      ],
+      vendor_details: null,
       headers: [
         {
           text: 'Invoice ID',
@@ -183,6 +193,19 @@ export default {
     this.initialize()
   },
   methods: {
+    getVendor (id) {
+      this.loading = true
+      apiVendor.get(id)
+        .then(response => {
+          this.vendor_details = response.data
+          console.log(response.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+        .finally(() => (this.loading = false))
+    },
+
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'
     },
@@ -242,6 +265,9 @@ export default {
       const index = this.desserts.indexOf(item)
       confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
     }
+  },
+  mounted () {
+    this.getVendor(this.$route.params.id)
   }
 }
 </script>

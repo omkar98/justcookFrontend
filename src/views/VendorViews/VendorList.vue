@@ -24,8 +24,8 @@
         </v-list-item>
         <v-data-table
             :headers="headers"
-            :items="desserts"
-            sort-by="calories"
+            :items="vendors"
+            sort-by="name"
             class="elevation-0"
         >
         <template v-slot:top>
@@ -68,6 +68,7 @@
 <script>
 import AdminDashboardHeader from '@/components/layout/AdminDashboardHeader.vue'
 import AdminDashboardSideNav from '@/components/layout/AdminDashboardSideNav.vue'
+import apiVendor from './apiVendor'
 
 export default {
   data () {
@@ -75,18 +76,15 @@ export default {
       drawer: null,
       headers: [
         {
-          text: 'Dessert (100g serving)',
+          text: 'ID',
           align: 'start',
-          sortable: false,
-          value: 'name'
+          sortable: true,
+          value: 'id'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Actions', value: 'actions', sortable: false }
+        { text: 'Name', value: 'name' },
+        { text: 'Phone No', value: 'phone_no' }
       ],
-      desserts: []
+      vendors: []
     }
   },
   components: {
@@ -106,51 +104,23 @@ export default {
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'
     },
-    initialize () {
-      this.desserts = [
-        {
-          id: 1,
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0
-        },
-        {
-          id: 2,
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9
-        }
-      ]
-    },
     deleteItem (item) {
-      const index = this.desserts.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
+      const index = this.vendors.indexOf(item)
+      confirm('Are you sure you want to delete this item?') && this.vendors.splice(index, 1)
+    },
+    retrieveVendors () {
+      apiVendor.getAll()
+        .then(response => {
+          this.vendors = response.data
+          console.log(response.data)
+        })
+        .catch(e => {
+          console.log(e)
+        })
     }
+  },
+  mounted () {
+    this.retrieveVendors()
   }
 }
 </script>
