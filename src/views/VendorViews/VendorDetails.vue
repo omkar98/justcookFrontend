@@ -89,7 +89,7 @@
                           small
                           @click="deleteItem(item)"
                       >
-                          mdi-delete
+                          mdi-download
                       </v-icon>
                       </template>
                       </v-data-table>

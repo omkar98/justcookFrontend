@@ -8,6 +8,7 @@ import DeleteVendorDetails from '@/views/VendorViews/DeleteVendorDetails.vue'
 import VendorList from '@/views/VendorViews/VendorList.vue'
 import VendorDetails from '@/views/VendorViews/VendorDetails.vue'
 import CreateVendorPO from '@/views/VendorViews/CreateVendorPO.vue'
+import InvoiceTemplate from '@/views/VendorViews/InvoiceTemplate.vue'
 
 Vue.use(VueRouter)
 
@@ -51,6 +52,11 @@ const routes = [
     path: '/purchase-order',
     name: 'CreateVendorPO',
     component: CreateVendorPO
+  },
+  {
+    path: '/invoice',
+    name: 'InvoiceTemplate',
+    component: InvoiceTemplate
   }
 ]
 const router = new VueRouter({
