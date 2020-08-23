@@ -49,7 +49,7 @@ const routes = [
     component: DeleteVendorDetails
   },
   {
-    path: '/purchase-order',
+    path: '/purchase-order/:id',
     name: 'CreateVendorPO',
     component: CreateVendorPO
   },

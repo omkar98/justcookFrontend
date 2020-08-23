@@ -74,6 +74,8 @@ export default {
   data () {
     return {
       drawer: null,
+      dialog: false,
+      res: '',
       headers: [
         {
           text: 'ID',
@@ -106,14 +108,15 @@ export default {
       this.drawer = currentDrawer ? 'false' : 'true'
     },
     deleteVendor (item) {
-      confirm('Are you sure you want to delete this item?')
-      apiVendor.delete(item)
-        .then(response => {
-          this.$router.push({ name: '/' })
-        })
-        .catch(e => {
-          console.log(e)
-        })
+      this.$confirm('Do you really want to exit?').then(res => {
+        apiVendor.delete(item)
+          .then(response => {
+            console.log('Deleted')
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      })
     },
     retrieveVendors () {
       apiVendor.getAll()

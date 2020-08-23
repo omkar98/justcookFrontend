@@ -85,7 +85,7 @@
               <ul>
                 <li><a href="/">Click Here</a> to view all the Purchase Orders by Vendor-Name</li>
                 <li><a href="/">Click Here</a> to view all the Invoices by Vendor-Name  </li>
-                <li><a href="/">Click Here</a> to create a New Purchase Order for Vendor-Name</li>
+                <li><router-link :to="`/purchase-order/${$route.params.id}`">Click Here to add new purchase order</router-link></li>
               </ul>
               <template>
                 <v-row justify="center">

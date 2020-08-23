@@ -78,6 +78,7 @@ export default {
   data () {
     return {
       drawer: null,
+      valid: true,
       name: '',
       nameRules: [
         v => !!v || 'Name is required',
@@ -114,17 +115,20 @@ export default {
       this.formData.append('image', event)
     },
     saveVendor () {
-      this.formData.append('name', this.vendor.name)
-      this.formData.append('address', this.vendor.address)
-      this.formData.append('phone_no', this.vendor.phone_no)
+      if (this.$refs.form.validate()) {
+        this.formData.append('name', this.vendor.name)
+        this.formData.append('address', this.vendor.address)
+        this.formData.append('phone_no', this.vendor.phone_no)
 
-      apiVendor.create(this.formData)
-        .then(response => {
-          this.vendor.id = response.data.id
-        })
-        .catch(e => {
-          console.log(e)
-        })
+        apiVendor.create(this.formData)
+          .then(response => {
+            this.vendor.id = response.data.id
+            this.$refs.form.reset()
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      }
     },
     toggleDrawer (currentDrawer) {
       this.drawer = currentDrawer ? 'false' : 'true'

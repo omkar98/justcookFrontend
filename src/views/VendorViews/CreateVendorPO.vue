@@ -44,18 +44,33 @@
                     class="pa-5">
                     <p>Vendor ID: </p>
                      <v-select
-                      v-model="product"
-                      :hint="`ProductId: ${product.id}, ProductName: ${product.title}`"
+                      v-model="purchase_order.product_id"
+                      :hint="`ProductId: ${purchase_order.product_id.id}, ProductName: ${purchase_order.product_id.title}`"
                       :items="product_items"
                       item-text="title"
                       item-value="id"
-                      label="Select"
+                      label="Product"
                       persistent-hint
                       return-object
                       single-line
                     ></v-select>
+                    <v-text-field
+                      v-model="purchase_order.payment_received"
+                      label="Payment Received"
+                      required
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="purchase_order.payment_due"
+                      label="Payment Due"
+                      required
+                    ></v-text-field>
+                    <v-text-field
+                      v-model="purchase_order.qty"
+                      label="Quantity"
+                      required
+                    ></v-text-field>
                     <v-menu
-                      v-model="delivery_date"
+                      v-model="purchase_order.date"
                       :close-on-content-click="false"
                       :nudge-right="40"
                       transition="scale-transition"
@@ -64,7 +79,7 @@
                     >
                     <template v-slot:activator="{ on, attrs }">
                       <v-text-field
-                        v-model="date"
+                        v-model="purchase_order.delivery_datetime"
                         label="Date of Delivery"
                         prepend-icon="mdi-truck-delivery"
                         :rules="[v => !!v || 'Date is required']"
@@ -74,19 +89,19 @@
                         required
                       ></v-text-field>
                     </template>
-                    <v-date-picker v-model="date" @input="menu2 = false"></v-date-picker>
+                    <v-date-picker v-model="purchase_order.delivery_datetime" @input="menu2 = false"></v-date-picker>
                     </v-menu>
                     <v-select
-                      v-model="select_payment"
+                      v-model="purchase_order.payment_mode"
                       :items="mode_of_payment"
                       :rules="[v => !!v || 'Item is required']"
                       label="Model of Payment"
                       required
                     ></v-select>
-                    <v-file-input v-if="select_payment==='Cash'" multiple label="Upload Cash Receipt" chips show-size></v-file-input>
+                    <v-file-input v-if="purchase_order.payment_mode==='Cash'" @change="onFileUpload" label="Upload Cash Receipt" type="file"></v-file-input>
                     <v-btn
                       color="warning"
-                      @click="resetValidation"
+                      @click="savePurchaseOrder"
                     >
                       Submit
                     </v-btn>
@@ -106,17 +121,26 @@
 import AdminDashboardHeader from '@/components/layout/AdminDashboardHeader.vue'
 import AdminDashboardSideNav from '@/components/layout/AdminDashboardSideNav.vue'
 import apiProduct from './apiProduct'
+import apiPurchaseOrder from './apiPurchaseOrder'
 
 export default {
   data () {
     return {
       drawer: null,
-      date: '',
-      delivery_date: false,
       mode_of_payment: ['Cash', 'Online'],
-      select_payment: '',
-      product: { id: '', title: '' },
-      product_items: null
+      product_items: null,
+      formData: new FormData(),
+      purchase_order: {
+        vendor_id: this.$route.params.id,
+        product_id: { id: '', title: '' },
+        qty: '',
+        delivery_datetime: '',
+        date: false,
+        payment_mode: '',
+        payment_received: '',
+        payment_due: '',
+        cash_receipt: null
+      }
     }
   },
   props: {
@@ -131,6 +155,26 @@ export default {
       apiProduct.getAll()
         .then(response => {
           this.product_items = response.data
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    },
+    onFileUpload (event) {
+      console.log(event)
+      this.formData.append('cash_receipt', event)
+    },
+    savePurchaseOrder () {
+      this.formData.append('vendor_id', this.purchase_order.vendor_id)
+      this.formData.append('product_id', this.purchase_order.product_id.id)
+      this.formData.append('qty', this.purchase_order.qty)
+      this.formData.append('delivery_datetime', this.purchase_order.delivery_datetime)
+      this.formData.append('payment_mode', this.purchase_order.payment_mode)
+      this.formData.append('payment_due', this.purchase_order.payment_due)
+
+      apiPurchaseOrder.create(this.formData)
+        .then(response => {
+          console.log(response.data)
         })
         .catch(e => {
           console.log(e)
